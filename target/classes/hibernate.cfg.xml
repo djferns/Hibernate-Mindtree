@@ -13,7 +13,11 @@
 		<property name="show_sql">true</property>
 		<property name="hbm2ddl.auto">update</property>
 		
-		<mapping class="Day1.Employee"/>
+		<!-- <mapping class="Day1.Employee"/> -->
+		
+		<mapping class="Day2.Ranking"/>
+		<mapping class="Day2.Skill"/>
+		<mapping class="Day2.Student"/>
 		
 	</session-factory>
 </hibernate-configuration>
