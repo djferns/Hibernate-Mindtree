@@ -46,7 +46,7 @@ public class TestAssignment {
 	
 	public Skill findSkill(Session session, String name){
 		
-		Query query = session.createQuery("from Student s where s.name = :name");
+		Query query = session.createQuery("from Skill s where s.skillName = :name");
 		query.setParameter("name", name);
 
 		Skill skill = (Skill) query.uniqueResult();
@@ -67,7 +67,41 @@ public class TestAssignment {
 		return skill;
 	}
 	
+	public void createData(Session session, String subjectName, String observerName, String skillName, int rank){
+		Student subject = saveStudent(session, subjectName);
+		Student observer = saveStudent(session, observerName);
+		
+		Skill skill = saveSkill(session, skillName);
+		
+		Ranking ranking = new Ranking();
+		ranking.setSubject(subject);
+		ranking.setObserver(observer);
+		ranking.setSkill(skill);
+		ranking.setRating(rank);
+		
+		session.save(ranking);
+		
+	}
 	
+	public void changeRank(Session session, String subjectName, String observerName, String skillName, int newRating){
+		Query query = session.createQuery("from Ranking r"
+				+ " where r.subject.name= :subject"
+				+ " and r.observer.name= :observer"
+				+ " and r.skill.skillName= :skill");
+		query.setString("subject", subjectName);
+		query.setString("observer", observerName);
+		query.setString("skill", skillName);
+		
+		Ranking ranking = (Ranking) query.uniqueResult();
+		if(ranking == null){
+			System.out.println("Invalid Change Request");
+		}
+		
+		ranking.setRating(newRating);
+		
+		//session.update(ranking);
+		
+	}
 
 	public static void main(String[] args) {
 		TestAssignment testAssignment = new TestAssignment();
@@ -76,7 +110,7 @@ public class TestAssignment {
 		Session session = testAssignment.sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 
-		Student student1 = testAssignment.saveStudent(session, "Dexter Fernandes");
+		/*Student student1 = testAssignment.saveStudent(session, "Dexter Fernandes");
 		Student student2 = testAssignment.saveStudent(session, "Ujwal Ekka");
 
 		Skill skill1 = testAssignment.saveSkill(session, "Hibernate");
@@ -88,7 +122,15 @@ public class TestAssignment {
 		ranking.setSkill(skill1);
 		ranking.setRating(6);
 		
-		session.save(ranking);
+		session.save(ranking);*/
+		
+		//Add Ranks
+		/*testAssignment.createData(session, "Binay Das", "Prasant Senapati", "Java", 5);
+		testAssignment.createData(session, "Robin Gonsalves", "Amit Palekar", "MySQL", 8);
+		testAssignment.createData(session, "Robin Gonsalves", "Prasant Senapati", "MySQL", 8);*/
+		
+		//Update rating assigned by Prasant to Binay
+		testAssignment.changeRank(session, "Binay Das", "Prasant Senapati", "Java", 4);
 		
 		tx.commit();
 		session.close();
