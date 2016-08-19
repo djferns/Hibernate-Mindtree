@@ -69,5 +69,12 @@ public class Ranking {
 	public void setRating(int rating) {
 		this.rating = rating;
 	}
+
+	public Ranking(Student subject, Skill skill, int rating) {
+		super();
+		this.subject = subject;
+		this.skill = skill;
+		this.rating = rating;
+	}
 	
 }
