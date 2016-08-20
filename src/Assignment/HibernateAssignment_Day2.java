@@ -1,5 +1,6 @@
 package Assignment;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -15,7 +16,7 @@ import Day2.Ranking;
 import Day2.Skill;
 import Day2.Student;
 
-public class HibernateAssignment {
+public class HibernateAssignment_Day2 {
 
 	SessionFactory sessionFactory;
 
@@ -108,10 +109,9 @@ public class HibernateAssignment {
 		
 		ranking.setRating(newRating);
 		
-		//session.update(ranking);
-		
 	}
 	
+	/* Use Case 1 - Implement Remove Ranking */
 	public void removeRanking(Session session, String subjectName, String observerName, String skillName){
 		
 		Query query = session.createQuery("from Ranking r"
@@ -134,6 +134,7 @@ public class HibernateAssignment {
 		
 	}
 	
+	/* Use Case 2 - Get Average for each student for each skill */
 	public void findAverage(Session session){
 		
 		Query query = session.createQuery("select r.subject.name, r.skill.skillName, avg(r.rating)"
@@ -149,20 +150,38 @@ public class HibernateAssignment {
 		
 	}
 	
+	/* Use Case 3 - Find Topper */
 	public void findTopper(Session session){
 		
 		Query query = session.createQuery("select r.subject.name, r.skill.skillName, avg(r.rating) as Average"
 				+ " from Ranking r"
-				+ " group by r.subject, r.skill"
-				+ " order by Average desc");
-		query.setMaxResults(1);
+				+ " group by r.subject, r.skill");
 		
-		Object[] row = (Object[]) query.uniqueResult();
+		double topperRating = 0, oldTopperRating = 0;
+		List<Integer> topperList = null;
 		
-		System.out.print("\nName: " + row[0] + "; Skill: " + row[1] + "; Average Rating: " + row[2]);
+		List studentsList = query.list();
+
+		for(int i = 0; i < studentsList.size(); i++){
+			Object[] row = (Object[]) studentsList.get(i);
+			topperRating = (Double)row[2];
+			if(topperRating > oldTopperRating){
+				topperList = new ArrayList<Integer>();
+				topperList.add(i);
+				oldTopperRating = topperRating;
+			}else if(topperRating == oldTopperRating){
+				topperList.add(i);
+			}
+		}
+		
+		for(int subjectId : topperList){
+			Object[] row = (Object[]) studentsList.get(subjectId);
+			System.out.print("\nName: " + row[0] + "; Skill: " + row[1] + "; Average Rating: " + row[2]);
+		}
 		
 	}
 	
+	/* Use Case 4 - Sort students based on rank of certain skill */
 	public void sortOnRankForSkill(Session session){
 		
 		Query query = session.createQuery("select r.subject.name, r.skill.skillName, avg(r.rating) as Average"
@@ -181,7 +200,7 @@ public class HibernateAssignment {
 	
 	public static void main(String[] args) {
 		
-		HibernateAssignment hibernateAssignment = new HibernateAssignment();
+		HibernateAssignment_Day2 hibernateAssignment = new HibernateAssignment_Day2();
 		hibernateAssignment.setup();
 
 		Session session = hibernateAssignment.sessionFactory.openSession();
